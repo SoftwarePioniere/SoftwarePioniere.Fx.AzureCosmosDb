@@ -1,0 +1,51 @@
+<Project>
+
+  <PropertyGroup>
+   <DefaultItemExcludes>$(DefaultItemExcludes);$(MSBuildProjectDirectory)/obj/**/*</DefaultItemExcludes>
+    <DefaultItemExcludes>$(DefaultItemExcludes);$(MSBuildProjectDirectory)/bin/**/*</DefaultItemExcludes>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(DOTNET_RUNNING_IN_CONTAINER)' != 'true'">
+    <BaseIntermediateOutputPath>$(MSBuildProjectDirectory)/obj/local/</BaseIntermediateOutputPath>
+    <BaseOutputPath>$(MSBuildProjectDirectory)/bin/local/</BaseOutputPath>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(DOTNET_RUNNING_IN_CONTAINER)' == 'true'">
+    <BaseIntermediateOutputPath>$(MSBuildProjectDirectory)/obj/container/</BaseIntermediateOutputPath>
+    <BaseOutputPath>$(MSBuildProjectDirectory)/bin/container/</BaseOutputPath>
+  </PropertyGroup>
+
+  <PropertyGroup>
+      <AspNetCoreVersion>2.1.0-rc1-final</AspNetCoreVersion>
+      <CommonLibVersion>0.1.214</CommonLibVersion>
+  </PropertyGroup>
+
+  <PropertyGroup>
+      <MyVersion>99.99.99</MyVersion>
+      <IsPackable>True</IsPackable>
+      <Authors>SoftwarePioniere</Authors>
+      <PackageProjectUrl>https://github.com/SoftwarePioniere/SoftwarePioniere.ReadModel.AzureCosmosDb</PackageProjectUrl>
+      <RepositoryUrl>https://github.com/SoftwarePioniere/SoftwarePioniere.ReadModel.AzureCosmosDb</RepositoryUrl>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(NuGetVersionV2)' == '' ">
+      <Version>$(MyVersion)</Version>
+      <InformationalVersion>$(MyVersion)</InformationalVersion>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(AssemblySemVer)' == '' ">
+      <AssemblyVersion>$(MyVersion)</AssemblyVersion>
+      <FileVersion>$(MyVersion)</FileVersion>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(NuGetVersionV2)' != '' ">
+        <Version>$(NuGetVersionV2)</Version>
+        <InformationalVersion>$(NuGetVersionV2)</InformationalVersion>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(AssemblySemVer)' != '' ">
+        <AssemblyVersion>$(AssemblySemVer)</AssemblyVersion>
+        <FileVersion>$(AssemblySemVer)</FileVersion>
+  </PropertyGroup>
+
+</Project>
