@@ -132,7 +132,7 @@ Task("DockerTest")
                 $"SOPI_TESTS_AZURECOSMOSDB__AUTHKEY={EnvironmentVariable("SOPI_TESTS_AZURECOSMOSDB__AUTHKEY")}",
                 $"SOPI_TESTS_AZURECOSMOSDB__ENDPOINTURL={EnvironmentVariable("SOPI_TESTS_AZURECOSMOSDB__ENDPOINTURL")}",
                 $"SOPI_TESTS_AZURECOSMOSDB__CollectionId=sopi-test-run"
-            }
+            };
 
     MyDotNet.DockerTestProject(image + ".tests" , "SoftwarePioniere.ReadModel.Services.AzureCosmosDb.Tests", artifactsDirectory, env);
 });
