@@ -178,7 +178,7 @@ Task("DockerBuildPush")
     .IsDependentOn("DockerBuild")
     .IsDependentOn("DockerTest")
     .IsDependentOn("DockerPack")
-    // .IsDependentOn("DockerPushPackages")
+    .IsDependentOn("DockerPushPackages")
     ;
 
 ///////////////////////////////////////////////////////////////////////////////
