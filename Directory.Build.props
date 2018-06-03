@@ -16,7 +16,7 @@
   </PropertyGroup>
 
   <PropertyGroup>
-      <AspNetCoreVersion>2.1.0-rc1-final</AspNetCoreVersion>
+      <AspNetCoreVersion>2.1.0</AspNetCoreVersion>
       <CommonLibVersion>0.1.214</CommonLibVersion>
   </PropertyGroup>
 
