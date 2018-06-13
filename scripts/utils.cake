@@ -1,8 +1,19 @@
+#reference "System"
+#reference "System.IO"
+#reference "System.IO.FileSystem"
+
 public static bool IsTfs(ICakeContext context)
 {
     return (context.EnvironmentVariable("TF_BUILD") == "True");
 }
 
+public static void ReplaceTextInFile(ICakeContext context, string fileName, string findText, string replaceText)
+{
+    context.Verbose($"ReplaceTextInFile: {fileName}");
+    var contents = System.IO.File.ReadAllText(fileName, System.Text.Encoding.UTF8);
+    contents = contents.Replace(findText, replaceText);
+    System.IO.File.WriteAllText(fileName, contents, System.Text.Encoding.UTF8);
+}
 
 public static void SetBuildNumber(ICakeContext context, string version) {
      context.Verbose("Set Build Number");
@@ -13,11 +24,11 @@ public static void SetBuildNumber(ICakeContext context, string version) {
         // Update the AppVeyor version number.
         context.BuildSystem().AppVeyor.UpdateBuildVersion(version);
     }
-    
+
     //BuildSystem.TFBuild.IsRunningOnVSTS
     if (IsTfs(context)){
         context.Verbose("Running on VSTS");
-        
+
         // Update the TFS Build version number.
         context.BuildSystem().TFBuild.Commands.UpdateBuildNumber(version);
     }
