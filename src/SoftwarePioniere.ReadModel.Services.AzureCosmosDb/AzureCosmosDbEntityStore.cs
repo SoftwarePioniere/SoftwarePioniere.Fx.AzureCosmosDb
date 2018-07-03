@@ -28,6 +28,7 @@ namespace SoftwarePioniere.ReadModel.Services.AzureCosmosDb
             {
                 Logger.LogDebug("LoadItemsAsync: {EntityType}", typeof(T));
             }
+            token.ThrowIfCancellationRequested();
 
             var feedOptions = new FeedOptions { MaxItemCount = -1, EnableCrossPartitionQuery = false };
 
@@ -43,6 +44,7 @@ namespace SoftwarePioniere.ReadModel.Services.AzureCosmosDb
             {
                 Logger.LogDebug("LoadItemsAsync: {EntityType} {Expression}", typeof(T), where);
             }
+            token.ThrowIfCancellationRequested();
 
 
             var feedOptions = new FeedOptions { MaxItemCount = -1, EnableCrossPartitionQuery = false };
@@ -65,6 +67,7 @@ namespace SoftwarePioniere.ReadModel.Services.AzureCosmosDb
             {
                 Logger.LogDebug("LoadPagedResultAsync: {EntityType} {Paramter}", typeof(T), parms);
             }
+            token.ThrowIfCancellationRequested();
 
 
             var feedOptions = new FeedOptions() { MaxItemCount = parms.PageSize, EnableCrossPartitionQuery = false };
@@ -89,6 +92,7 @@ namespace SoftwarePioniere.ReadModel.Services.AzureCosmosDb
             countQuerySql = countQuerySql.Replace("*", "VALUE COUNT(1)");
 
             var countQuery = _provider.Client.Value.CreateDocumentQuery<int>(_provider.CollectionUri, new SqlQuerySpec(countQuerySql));
+            token.ThrowIfCancellationRequested();
 
             var totalCount = await countQuery.TakeOneAsync(token).ConfigureAwait(false);
 
@@ -117,6 +121,8 @@ namespace SoftwarePioniere.ReadModel.Services.AzureCosmosDb
             {
                 Logger.LogDebug("InternalDeleteItemAsync: {EntityType} {EntityId}", typeof(T), entityId);
             }
+            token.ThrowIfCancellationRequested();
+
 
             await _provider.DeleteItemAsync(entityId, TypeKeyCache.GetEntityTypeKey<T>());
         }
@@ -132,6 +138,8 @@ namespace SoftwarePioniere.ReadModel.Services.AzureCosmosDb
             {
                 Logger.LogDebug("InternalInsertItemAsync: {EntityType} {EntityId}", typeof(T), item.EntityId);
             }
+            token.ThrowIfCancellationRequested();
+
 
             await _provider.AddItemAsync(item).ConfigureAwait(false);
         }
@@ -147,6 +155,8 @@ namespace SoftwarePioniere.ReadModel.Services.AzureCosmosDb
             {
                 Logger.LogDebug("InternalInsertOrUpdateItemAsync: {EntityType} {EntityId}", typeof(T), item.EntityId);
             }
+            token.ThrowIfCancellationRequested();
+
 
             var exi = await _provider.ExistsDocument<T>(item.EntityId);
             if (exi)
@@ -170,7 +180,8 @@ namespace SoftwarePioniere.ReadModel.Services.AzureCosmosDb
             {
                 Logger.LogDebug("InternalLoadItemAsync: {EntityType} {EntityId}", typeof(T), entityId);
             }
-
+            token.ThrowIfCancellationRequested();
+            
             try
             {
                 var response = await _provider.Client.Value.ReadDocumentAsync(
@@ -205,6 +216,8 @@ namespace SoftwarePioniere.ReadModel.Services.AzureCosmosDb
             {
                 Logger.LogDebug("InternalUpdateItemAsync: {EntityType} {EntityId}", typeof(T), item.EntityId);
             }
+            token.ThrowIfCancellationRequested();
+
 
             await _provider.UpdateItemAsync(item, item.EntityId);
         }

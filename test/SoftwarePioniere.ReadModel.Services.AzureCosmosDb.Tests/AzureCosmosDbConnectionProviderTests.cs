@@ -14,7 +14,7 @@ namespace SoftwarePioniere.ReadModel.Services.AzureCosmosDb.Tests
         {
             ServiceCollection
                 .AddOptions()
-                .AddAzureCosmosDbEntityStore(options => Configurator.Instance.ConfigurationRoot.Bind("AzureCosmosDb", options));
+                .AddAzureCosmosDbEntityStore(options => new TestConfiguration().ConfigurationRoot.Bind("AzureCosmosDb", options));
         }
 
         private AzureCosmosDbConnectionProvider CreateProvider()

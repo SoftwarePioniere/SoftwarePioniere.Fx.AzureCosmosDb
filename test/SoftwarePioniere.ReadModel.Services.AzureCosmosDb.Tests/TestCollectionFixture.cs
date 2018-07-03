@@ -15,7 +15,7 @@ namespace SoftwarePioniere.ReadModel.Services.AzureCosmosDb.Tests
             services
                 .AddOptions()
                 .AddSingleton<ILoggerFactory>(new NullLoggerFactory())
-                .AddAzureCosmosDbEntityStore(options => Configurator.Instance.ConfigurationRoot.Bind("AzureCosmosDb", options));
+                .AddAzureCosmosDbEntityStore(options => new TestConfiguration().ConfigurationRoot.Bind("AzureCosmosDb", options));
 
             var provider = services.BuildServiceProvider().GetService<AzureCosmosDbConnectionProvider>();
             provider.DeleteDocumentCollectionAsync().ConfigureAwait(false).GetAwaiter().GetResult();
