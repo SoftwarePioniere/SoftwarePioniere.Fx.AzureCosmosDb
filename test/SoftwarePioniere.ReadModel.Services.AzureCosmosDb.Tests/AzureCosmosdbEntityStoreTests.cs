@@ -1,7 +1,6 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using SoftwarePioniere.ReadModel.Tests;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -15,6 +14,42 @@ namespace SoftwarePioniere.ReadModel.Services.AzureCosmosDb.Tests
             ServiceCollection
                 .AddOptions()
                 .AddAzureCosmosDbEntityStore(options => Configurator.Instance.ConfigurationRoot.Bind("AzureCosmosDb", options));
+        }
+
+        [Fact]
+        public override void DeleteWithCancelationThrowsError()
+        {
+            base.DeleteWithCancelationThrowsError();
+        }
+
+        [Fact]
+        public override void InsertWithCancelationThrowsError()
+        {
+            base.InsertWithCancelationThrowsError();
+        }
+
+        [Fact]
+        public override void LoadItemsWithPagingAndCancelationThrowsError()
+        {
+            base.LoadItemsWithPagingAndCancelationThrowsError();
+        }
+
+        [Fact]
+        public override void LoadItemsWithCancelationThrowsError()
+        {
+            base.LoadItemsWithCancelationThrowsError();
+        }
+
+        [Fact]
+        public override void LoadItemWithCancelationThrowsError()
+        {
+            base.LoadItemWithCancelationThrowsError();
+        }
+
+        [Fact]
+        public override void UpdateWithCancelationThrowsError()
+        {
+            base.UpdateWithCancelationThrowsError();
         }
 
         [Fact]

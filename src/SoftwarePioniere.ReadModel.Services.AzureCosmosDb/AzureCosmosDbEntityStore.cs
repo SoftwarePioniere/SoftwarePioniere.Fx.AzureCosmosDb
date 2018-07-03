@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Threading;
 using System.Threading.Tasks;
 using Foundatio.Caching;
 using Microsoft.Azure.Documents;
 using Microsoft.Azure.Documents.Client;
-using Microsoft.Azure.Documents.Linq;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -22,7 +22,7 @@ namespace SoftwarePioniere.ReadModel.Services.AzureCosmosDb
             _provider = provider ?? throw new ArgumentNullException(nameof(provider));
         }
 
-        public override async Task<T[]> LoadItemsAsync<T>()
+        public override async Task<T[]> LoadItemsAsync<T>(CancellationToken token = default(CancellationToken))
         {
             if (Logger.IsEnabled(LogLevel.Debug))
             {
@@ -33,11 +33,11 @@ namespace SoftwarePioniere.ReadModel.Services.AzureCosmosDb
 
             //type filtern wegen partition key verletzungen
             var source = _provider.CreateQuery<T>(feedOptions).Where(x => x.EntityType == TypeKeyCache.GetEntityTypeKey<T>());
-            var xx = await source.ToArrayAsync().ConfigureAwait(false);
+            var xx = await source.ToArrayAsync(token).ConfigureAwait(false);
             return xx;
         }
 
-        public override async Task<T[]> LoadItemsAsync<T>(Expression<Func<T, bool>> where)
+        public override async Task<T[]> LoadItemsAsync<T>(Expression<Func<T, bool>> where, CancellationToken token = default(CancellationToken))
         {
             if (Logger.IsEnabled(LogLevel.Debug))
             {
@@ -49,12 +49,12 @@ namespace SoftwarePioniere.ReadModel.Services.AzureCosmosDb
 
             //type filtern wegen partition key verletzungen
             var source = _provider.CreateQuery<T>(feedOptions).Where(x => x.EntityType == TypeKeyCache.GetEntityTypeKey<T>()).Where(where);
-            var xx = await source.ToArrayAsync().ConfigureAwait(false);
+            var xx = await source.ToArrayAsync(token).ConfigureAwait(false);
             return xx;
 
         }
 
-        public override async Task<PagedResults<T>> LoadPagedResultAsync<T>(PagedLoadingParameters<T> parms)
+        public override async Task<PagedResults<T>> LoadPagedResultAsync<T>(PagedLoadingParameters<T> parms, CancellationToken token = default(CancellationToken))
         {
             if (parms == null)
             {
@@ -90,9 +90,9 @@ namespace SoftwarePioniere.ReadModel.Services.AzureCosmosDb
 
             var countQuery = _provider.Client.Value.CreateDocumentQuery<int>(_provider.CollectionUri, new SqlQuerySpec(countQuerySql));
 
-            var totalCount = await countQuery.TakeOneAsync().ConfigureAwait(false);
+            var totalCount = await countQuery.TakeOneAsync(token).ConfigureAwait(false);
 
-            var res = await query.ToPagedResultsAsync().ConfigureAwait(false);
+            var res = await query.ToPagedResultsAsync(token).ConfigureAwait(false);
 
             return new PagedResults<T>
             {
@@ -106,7 +106,7 @@ namespace SoftwarePioniere.ReadModel.Services.AzureCosmosDb
 
         }
 
-        protected override async Task InternalDeleteItemAsync<T>(string entityId)
+        protected override async Task InternalDeleteItemAsync<T>(string entityId, CancellationToken token = default(CancellationToken))
         {
             if (string.IsNullOrEmpty(entityId))
             {
@@ -121,7 +121,7 @@ namespace SoftwarePioniere.ReadModel.Services.AzureCosmosDb
             await _provider.DeleteItemAsync(entityId, TypeKeyCache.GetEntityTypeKey<T>());
         }
 
-        protected override async Task InternalInsertItemAsync<T>(T item)
+        protected override async Task InternalInsertItemAsync<T>(T item, CancellationToken token = default(CancellationToken))
         {
             if (item == null)
             {
@@ -136,7 +136,7 @@ namespace SoftwarePioniere.ReadModel.Services.AzureCosmosDb
             await _provider.AddItemAsync(item).ConfigureAwait(false);
         }
 
-        protected override async Task InternalInsertOrUpdateItemAsync<T>(T item)
+        protected override async Task InternalInsertOrUpdateItemAsync<T>(T item, CancellationToken token = default(CancellationToken))
         {
             if (item == null)
             {
@@ -151,15 +151,15 @@ namespace SoftwarePioniere.ReadModel.Services.AzureCosmosDb
             var exi = await _provider.ExistsDocument<T>(item.EntityId);
             if (exi)
             {
-                await UpdateItemAsync(item).ConfigureAwait(false);
+                await UpdateItemAsync(item, token).ConfigureAwait(false);
             }
             else
             {
-                await InsertItemAsync(item).ConfigureAwait(false);
+                await InsertItemAsync(item, token).ConfigureAwait(false);
             }
         }
 
-        protected override async Task<T> InternalLoadItemAsync<T>(string entityId)
+        protected override async Task<T> InternalLoadItemAsync<T>(string entityId, CancellationToken token = default(CancellationToken))
         {
             if (string.IsNullOrEmpty(entityId))
             {
@@ -193,9 +193,9 @@ namespace SoftwarePioniere.ReadModel.Services.AzureCosmosDb
 
         }
 
-        protected override async Task InternalUpdateItemAsync<T>(T item)
+        protected override async Task InternalUpdateItemAsync<T>(T item, CancellationToken token = default(CancellationToken))
         {
-           
+
             if (item == null)
             {
                 throw new ArgumentNullException(nameof(item));
