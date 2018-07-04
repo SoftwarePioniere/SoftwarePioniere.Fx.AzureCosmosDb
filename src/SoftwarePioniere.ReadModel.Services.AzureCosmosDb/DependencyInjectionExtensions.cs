@@ -4,7 +4,7 @@ using SoftwarePioniere.ReadModel;
 using SoftwarePioniere.ReadModel.Services.AzureCosmosDb;
 
 // ReSharper disable once CheckNamespace
-namespace SoftwarePioniere
+namespace SoftwarePioniere.Extensions.DependencyInjection
 {
     public static class DependencyInjectionExtensions
     {

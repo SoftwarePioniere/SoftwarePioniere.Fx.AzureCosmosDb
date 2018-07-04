@@ -3,6 +3,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
+using SoftwarePioniere.Extensions.DependencyInjection;
 
 namespace SoftwarePioniere.ReadModel.Services.AzureCosmosDb.Tests
 {

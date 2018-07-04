@@ -17,7 +17,7 @@ var isDryRun        = HasArgument("dryrun1");
 
 var artifactsDirectory  = Directory("./artifacts");
 var version             = "0.0.0";
-var solutionFile        = File("./SoftwarePioniere.ReadModel.AzureCosmosDb.sln");
+var solutionFile        = File("./SoftwarePioniere.AzureCosmosDb.sln");
 var image               = "softwarepioniere/softwarepioniere.readmodel.azurecosmosdb";
 var nugetApiKey         = "VSTS";
 var vstsToken           = "XXX";
@@ -166,7 +166,7 @@ Task("BuildTestPackLocalPush")
     .IsDependentOn("Version")
     .IsDependentOn("Restore")
     .IsDependentOn("Build")
-    .IsDependentOn("Test")
+    //.IsDependentOn("Test")
     .IsDependentOn("Pack")
     .IsDependentOn("PushPackagesLocal")
     ;
