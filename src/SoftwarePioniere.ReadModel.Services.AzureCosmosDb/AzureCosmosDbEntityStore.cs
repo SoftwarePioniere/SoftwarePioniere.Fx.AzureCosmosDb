@@ -144,6 +144,27 @@ namespace SoftwarePioniere.ReadModel.Services.AzureCosmosDb
             await _provider.AddItemAsync(item).ConfigureAwait(false);
         }
 
+        protected override async Task InternalBulkInsertItemsAsync<T>(T[] items, CancellationToken token = new CancellationToken())
+        {
+            if (items == null)
+            {
+                throw new ArgumentNullException(nameof(items));
+            }
+            
+            if (Logger.IsEnabled(LogLevel.Debug))
+            {
+                Logger.LogDebug("BulkInsertItemsAsync: {EntityType} {EntityCount}", typeof(T), items.Length);
+            }
+
+
+            foreach (var item in items)
+            {
+                token.ThrowIfCancellationRequested();
+                await InsertItemAsync(item, token);
+            }
+
+        }
+
         protected override async Task InternalInsertOrUpdateItemAsync<T>(T item, CancellationToken token = default(CancellationToken))
         {
             if (item == null)

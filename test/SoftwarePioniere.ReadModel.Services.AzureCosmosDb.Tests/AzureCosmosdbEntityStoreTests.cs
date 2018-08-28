@@ -18,6 +18,12 @@ namespace SoftwarePioniere.ReadModel.Services.AzureCosmosDb.Tests
         }
 
         [Fact]
+        public override Task CanBulkInsertManyItems()
+        {
+            return base.CanBulkInsertManyItems();
+        }
+
+        [Fact]
         public override void DeleteWithCancelationThrowsError()
         {
             base.DeleteWithCancelationThrowsError();
