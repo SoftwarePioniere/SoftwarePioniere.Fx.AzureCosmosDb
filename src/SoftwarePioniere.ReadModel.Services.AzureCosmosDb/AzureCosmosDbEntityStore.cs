@@ -150,7 +150,7 @@ namespace SoftwarePioniere.ReadModel.Services.AzureCosmosDb
             {
                 throw new ArgumentNullException(nameof(items));
             }
-            
+
             if (Logger.IsEnabled(LogLevel.Debug))
             {
                 Logger.LogDebug("BulkInsertItemsAsync: {EntityType} {EntityCount}", typeof(T), items.Length);
@@ -202,26 +202,50 @@ namespace SoftwarePioniere.ReadModel.Services.AzureCosmosDb
                 Logger.LogDebug("InternalLoadItemAsync: {EntityType} {EntityId}", typeof(T), entityId);
             }
             token.ThrowIfCancellationRequested();
-            
-            try
-            {
-                var response = await _provider.Client.Value.ReadDocumentAsync(
-                    _provider.GetDocumentLink(entityId),
-                    new RequestOptions { PartitionKey = new PartitionKey(TypeKeyCache.GetEntityTypeKey<T>()) });
 
-                var result = response.Resource.ToString();
-                var item = JsonConvert.DeserializeObject<T>(result);
-                return item;
-            }
-            catch (DocumentClientException e)
-            {
-                if (e.Error.Code == "NotFound")
-                {
-                    return null;
-                }
+            //try
+            //{
 
-                throw;
+
+            //var feedOptions = new FeedOptions() { EnableCrossPartitionQuery = false };
+            ////type filtern wegen partition key verletzungen
+            //var query = _provider.CreateQuery<T>(feedOptions).Where(x => x.EntityType == TypeKeyCache.GetEntityTypeKey<T>());
+            //query = query.Where(x => x.EntityId == entityId);
+
+            //var jo = JObject.Parse(query.ToString());
+            //var countQuerySql = jo["query"].Value<string>();
+            //countQuerySql = countQuerySql.Replace("*", "VALUE COUNT(1)");
+
+            var countQuerySql = $"SELECT VALUE COUNT(1) FROM root WHERE ((root[\"entity_type\"] = \"{TypeKeyCache.GetEntityTypeKey<T>()}\") AND (root[\"id\"] = \"{entityId}\"))";
+            var countQuery = _provider.Client.Value.CreateDocumentQuery<int>(_provider.CollectionUri, new SqlQuerySpec(countQuerySql));
+            token.ThrowIfCancellationRequested();
+
+            var totalCount = await countQuery.TakeOneAsync(token).ConfigureAwait(false);
+
+            if (totalCount == 0)
+            {
+                Logger.LogDebug("No Value count");
+                return null;
             }
+
+            var response = await _provider.Client.Value.ReadDocumentAsync(
+                _provider.GetDocumentLink(entityId),
+                new RequestOptions { PartitionKey = new PartitionKey(TypeKeyCache.GetEntityTypeKey<T>()) },
+                token);
+
+            var result = response.Resource.ToString();
+            var item = JsonConvert.DeserializeObject<T>(result);
+            return item;
+            //}
+            //catch (DocumentClientException e)
+            //{
+            //    if (e.Error.Code == "NotFound")
+            //    {
+            //        return null;
+            //    }
+
+            //    throw;
+            //}
 
         }
 
