@@ -3,7 +3,6 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
-using Foundatio.Caching;
 using Microsoft.Azure.Documents;
 using Microsoft.Azure.Documents.Client;
 using Microsoft.Extensions.Logging;
@@ -12,12 +11,12 @@ using Newtonsoft.Json.Linq;
 
 namespace SoftwarePioniere.ReadModel.Services.AzureCosmosDb
 {
-    public class AzureCosmosDbEntityStore : EntityStoreBase
+    public class AzureCosmosDbEntityStore : EntityStoreBase<AzureCosmosDbOptions>
     {
         private readonly AzureCosmosDbConnectionProvider _provider;
 
-        public AzureCosmosDbEntityStore(ILoggerFactory loggerFactory, ICacheClient cacheClient,
-            AzureCosmosDbConnectionProvider provider) : base(loggerFactory, cacheClient)
+        public AzureCosmosDbEntityStore(AzureCosmosDbOptions options,
+            AzureCosmosDbConnectionProvider provider) : base(options)
         {
             _provider = provider ?? throw new ArgumentNullException(nameof(provider));
         }

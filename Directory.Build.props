@@ -1,51 +1,57 @@
 <Project>
 
-  <PropertyGroup>
-   <DefaultItemExcludes>$(DefaultItemExcludes);$(MSBuildProjectDirectory)/obj/**/*</DefaultItemExcludes>
-    <DefaultItemExcludes>$(DefaultItemExcludes);$(MSBuildProjectDirectory)/bin/**/*</DefaultItemExcludes>
-  </PropertyGroup>
+    <PropertyGroup>
+        <ParentBuildProps>$([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)../'))</ParentBuildProps>
+    </PropertyGroup>
 
-  <PropertyGroup Condition="'$(DOTNET_RUNNING_IN_CONTAINER)' != 'true'">
-    <BaseIntermediateOutputPath>$(MSBuildProjectDirectory)/obj/local/</BaseIntermediateOutputPath>
-    <BaseOutputPath>$(MSBuildProjectDirectory)/bin/local/</BaseOutputPath>
-  </PropertyGroup>
+    <Import Condition="Exists('$(ParentBuildProps)')" Project="$(ParentBuildProps)" />
 
-  <PropertyGroup Condition="'$(DOTNET_RUNNING_IN_CONTAINER)' == 'true'">
-    <BaseIntermediateOutputPath>$(MSBuildProjectDirectory)/obj/container/</BaseIntermediateOutputPath>
-    <BaseOutputPath>$(MSBuildProjectDirectory)/bin/container/</BaseOutputPath>
-  </PropertyGroup>
+    <PropertyGroup>
+        <DefaultItemExcludes>$(DefaultItemExcludes);$(MSBuildProjectDirectory)/obj/**/*</DefaultItemExcludes>
+        <DefaultItemExcludes>$(DefaultItemExcludes);$(MSBuildProjectDirectory)/bin/**/*</DefaultItemExcludes>
+    </PropertyGroup>
 
-  <PropertyGroup>
-      <AspNetCoreVersion>2.1.0</AspNetCoreVersion>
-      <CommonLibVersion>0.1.214</CommonLibVersion>
-  </PropertyGroup>
+    <PropertyGroup Condition="'$(DOTNET_RUNNING_IN_CONTAINER)' != 'true'">
+        <BaseIntermediateOutputPath>$(MSBuildProjectDirectory)/obj/local/</BaseIntermediateOutputPath>
+        <BaseOutputPath>$(MSBuildProjectDirectory)/bin/local/</BaseOutputPath>
+    </PropertyGroup>
 
-  <PropertyGroup>
-      <MyVersion>99.99.99</MyVersion>
-      <IsPackable>True</IsPackable>
-      <Authors>SoftwarePioniere</Authors>
-      <PackageProjectUrl>https://github.com/SoftwarePioniere/SoftwarePioniere.ReadModel.AzureCosmosDb</PackageProjectUrl>
-      <RepositoryUrl>https://github.com/SoftwarePioniere/SoftwarePioniere.ReadModel.AzureCosmosDb</RepositoryUrl>
-  </PropertyGroup>
+    <PropertyGroup Condition="'$(DOTNET_RUNNING_IN_CONTAINER)' == 'true'">
+        <BaseIntermediateOutputPath>$(MSBuildProjectDirectory)/obj/container/</BaseIntermediateOutputPath>
+        <BaseOutputPath>$(MSBuildProjectDirectory)/bin/container/</BaseOutputPath>
+    </PropertyGroup>
 
-  <PropertyGroup Condition=" '$(NuGetVersionV2)' == '' ">
-      <Version>$(MyVersion)</Version>
-      <InformationalVersion>$(MyVersion)</InformationalVersion>
-  </PropertyGroup>
+    <PropertyGroup>
+        <AspNetCoreVersion>2.1.0</AspNetCoreVersion>
+        <CommonLibVersion>0.1.214</CommonLibVersion>
+    </PropertyGroup>
 
-  <PropertyGroup Condition=" '$(AssemblySemVer)' == '' ">
-      <AssemblyVersion>$(MyVersion)</AssemblyVersion>
-      <FileVersion>$(MyVersion)</FileVersion>
-  </PropertyGroup>
+    <PropertyGroup>
+        <MyVersion>99.99.99</MyVersion>
+        <IsPackable>True</IsPackable>
+        <Authors>SoftwarePioniere</Authors>
+        <PackageProjectUrl>https://github.com/SoftwarePioniere/SoftwarePioniere.ReadModel.AzureCosmosDb</PackageProjectUrl>
+        <RepositoryUrl>https://github.com/SoftwarePioniere/SoftwarePioniere.ReadModel.AzureCosmosDb</RepositoryUrl>
+    </PropertyGroup>
 
-  <PropertyGroup Condition=" '$(NuGetVersionV2)' != '' ">
+    <PropertyGroup Condition=" '$(NuGetVersionV2)' == '' ">
+        <Version>$(MyVersion)</Version>
+        <InformationalVersion>$(MyVersion)</InformationalVersion>
+    </PropertyGroup>
+
+    <PropertyGroup Condition=" '$(AssemblySemVer)' == '' ">
+        <AssemblyVersion>$(MyVersion)</AssemblyVersion>
+        <FileVersion>$(MyVersion)</FileVersion>
+    </PropertyGroup>
+
+    <PropertyGroup Condition=" '$(NuGetVersionV2)' != '' ">
         <Version>$(NuGetVersionV2)</Version>
         <InformationalVersion>$(NuGetVersionV2)</InformationalVersion>
-  </PropertyGroup>
+    </PropertyGroup>
 
-  <PropertyGroup Condition=" '$(AssemblySemVer)' != '' ">
+    <PropertyGroup Condition=" '$(AssemblySemVer)' != '' ">
         <AssemblyVersion>$(AssemblySemVer)</AssemblyVersion>
         <FileVersion>$(AssemblySemVer)</FileVersion>
-  </PropertyGroup>
+    </PropertyGroup>
 
 </Project>

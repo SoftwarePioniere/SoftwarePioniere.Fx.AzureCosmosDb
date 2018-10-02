@@ -2,12 +2,20 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
-     <Description>ReadModel Services Azure CosmosDb Implementations</Description>
+    <Description>ReadModel Services Azure CosmosDb Implementations</Description>
   </PropertyGroup>
 
+  <ItemGroup Condition=" '$(UseLocalSources)' != 'true' ">
+    <PackageReference Include="SoftwarePioniere.ReadModel.Services" Version="0.2.27" />
+  </ItemGroup>
+
+  <ItemGroup Condition=" '$(UseLocalSources)' == 'true' ">
+    <ProjectReference Include="..\..\..\SoftwarePioniere.Fx\src\SoftwarePioniere.ReadModel.Services\SoftwarePioniere.ReadModel.Services.csproj" />
+  </ItemGroup>
+
+
   <ItemGroup>
-    <PackageReference Include="SoftwarePioniere.ReadModel.Services" Version="0.2.25" />
-    <PackageReference Include="Microsoft.Azure.DocumentDB.Core" Version="2.0.0" />
+    <PackageReference Include="Microsoft.Azure.DocumentDB.Core" Version="2.1.1" />
   </ItemGroup>
 
 </Project>

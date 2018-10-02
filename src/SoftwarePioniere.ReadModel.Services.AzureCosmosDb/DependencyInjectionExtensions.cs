@@ -1,5 +1,8 @@
 ﻿using System;
+using Foundatio.Caching;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using SoftwarePioniere.ReadModel;
 using SoftwarePioniere.ReadModel.Services.AzureCosmosDb;
 
@@ -23,7 +26,14 @@ namespace SoftwarePioniere.Extensions.DependencyInjection
             services
                 .AddSingleton<AzureCosmosDbConnectionProvider>()
                 .AddSingleton<IEntityStoreConnectionProvider>(provider => provider.GetRequiredService<AzureCosmosDbConnectionProvider>())
-                .AddSingleton<IEntityStore, AzureCosmosDbEntityStore>();
+                .AddSingleton<IEntityStore>(provider =>
+                {
+                    var options = provider.GetRequiredService<IOptions<AzureCosmosDbOptions>>().Value;
+                    options.CacheClient = provider.GetRequiredService<ICacheClient>();
+                    options.LoggerFactory = provider.GetRequiredService<ILoggerFactory>();
+
+                    return new AzureCosmosDbEntityStore(options, provider.GetRequiredService<AzureCosmosDbConnectionProvider>());
+                });
 
             return services;
         }

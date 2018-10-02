@@ -1,6 +1,6 @@
 ﻿namespace SoftwarePioniere.ReadModel.Services.AzureCosmosDb
 {
-    public class AzureCosmosDbOptions
+    public class AzureCosmosDbOptions : EntityStoreOptionsBase
     {
         public string CollectionId { get; set; } = "dev";
 
