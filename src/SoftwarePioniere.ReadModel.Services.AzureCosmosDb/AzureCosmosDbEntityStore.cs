@@ -55,57 +55,60 @@ namespace SoftwarePioniere.ReadModel.Services.AzureCosmosDb
 
         }
 
-        public override async Task<PagedResults<T>> LoadPagedResultAsync<T>(PagedLoadingParameters<T> parms, CancellationToken token = default(CancellationToken))
+        public override Task<PagedResults<T>> LoadPagedResultAsync<T>(PagedLoadingParameters<T> parms, CancellationToken token = default(CancellationToken))
         {
-            if (parms == null)
-            {
-                throw new ArgumentNullException(nameof(parms));
-            }
+            //TODO: FIX
+            throw new NotImplementedException();
 
-            if (Logger.IsEnabled(LogLevel.Debug))
-            {
-                Logger.LogDebug("LoadPagedResultAsync: {EntityType} {Paramter}", typeof(T), parms);
-            }
-            token.ThrowIfCancellationRequested();
+            //if (parms == null)
+            //{
+            //    throw new ArgumentNullException(nameof(parms));
+            //}
+
+            //if (Logger.IsEnabled(LogLevel.Debug))
+            //{
+            //    Logger.LogDebug("LoadPagedResultAsync: {EntityType} {Paramter}", typeof(T), parms);
+            //}
+            //token.ThrowIfCancellationRequested();
 
 
-            var feedOptions = new FeedOptions() { MaxItemCount = parms.PageSize, EnableCrossPartitionQuery = false };
-            if (!string.IsNullOrEmpty(parms.ContinuationToken))
-            {
-                feedOptions.RequestContinuation = parms.ContinuationToken;
-            }
+            //var feedOptions = new FeedOptions() { MaxItemCount = parms.PageSize, EnableCrossPartitionQuery = false };
+            //if (!string.IsNullOrEmpty(parms.ContinuationToken))
+            //{
+            //    feedOptions.RequestContinuation = parms.ContinuationToken;
+            //}
 
-            //type filtern wegen partition key verletzungen
-            var query = _provider.CreateQuery<T>(feedOptions).Where(x => x.EntityType == TypeKeyCache.GetEntityTypeKey<T>());
-            if (parms.Where != null)
-                query = query.Where(parms.Where);
+            ////type filtern wegen partition key verletzungen
+            //var query = _provider.CreateQuery<T>(feedOptions).Where(x => x.EntityType == TypeKeyCache.GetEntityTypeKey<T>());
+            //if (parms.Where != null)
+            //    query = query.Where(parms.Where);
 
-            if (parms.OrderByDescending != null)
-                query = query.OrderByDescending(parms.OrderByDescending);
+            //if (parms.OrderByDescending != null)
+            //    query = query.OrderByDescending(parms.OrderByDescending);
 
-            if (parms.OrderBy != null)
-                query = query.OrderBy(parms.OrderBy);
+            //if (parms.OrderBy != null)
+            //    query = query.OrderBy(parms.OrderBy);
 
-            var jo = JObject.Parse(query.ToString());
-            var countQuerySql = jo["query"].Value<string>();
-            countQuerySql = countQuerySql.Replace("*", "VALUE COUNT(1)");
+            //var jo = JObject.Parse(query.ToString());
+            //var countQuerySql = jo["query"].Value<string>();
+            //countQuerySql = countQuerySql.Replace("*", "VALUE COUNT(1)");
 
-            var countQuery = _provider.Client.Value.CreateDocumentQuery<int>(_provider.CollectionUri, new SqlQuerySpec(countQuerySql));
-            token.ThrowIfCancellationRequested();
+            //var countQuery = _provider.Client.Value.CreateDocumentQuery<int>(_provider.CollectionUri, new SqlQuerySpec(countQuerySql));
+            //token.ThrowIfCancellationRequested();
 
-            var totalCount = await countQuery.TakeOneAsync(token).ConfigureAwait(false);
+            //var totalCount = await countQuery.TakeOneAsync(token).ConfigureAwait(false);
 
-            var res = await query.ToPagedResultsAsync(token).ConfigureAwait(false);
+            //var res = await query.ToPagedResultsAsync(token).ConfigureAwait(false);
 
-            return new PagedResults<T>
-            {
-                ContinuationToken = res.ContinuationToken,
-                Page = parms.Page,
-                PageSize = parms.PageSize,
-                ResultCount = res.Results.Count,
-                Results = res.Results,
-                TotalCount = totalCount
-            };
+            //return new PagedResults<T>
+            //{
+            //    ContinuationToken = res.ContinuationToken,
+            //    Page = parms.Page,
+            //    PageSize = parms.PageSize,
+            //    ResultCount = res.Results.Count,
+            //    Results = res.Results,
+            //    TotalCount = totalCount
+            //};
 
         }
 

@@ -1,4 +1,4 @@
-FROM microsoft/dotnet:2.2-sdk AS restore
+FROM microsoft/dotnet:2-sdk AS restore
 ARG CONFIGURATION=Release
 WORKDIR /proj
 COPY nuget.config.build.tmp ./nuget.config
