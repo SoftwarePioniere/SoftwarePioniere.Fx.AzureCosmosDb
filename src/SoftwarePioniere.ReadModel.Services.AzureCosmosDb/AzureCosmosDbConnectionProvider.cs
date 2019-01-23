@@ -6,7 +6,6 @@ using Microsoft.Azure.Documents.Client;
 using Microsoft.Azure.Documents.Linq;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Polly;
 
 namespace SoftwarePioniere.ReadModel.Services.AzureCosmosDb
 {
@@ -97,8 +96,9 @@ namespace SoftwarePioniere.ReadModel.Services.AzureCosmosDb
             {
                 ConnectionMode = ConnectionMode.Gateway,
                 ConnectionProtocol = Protocol.Https,
-                MaxConnectionLimit = 100
+                MaxConnectionLimit = 100                
             };
+            
             var endpoint = new Uri(Options.EndpointUrl);
             var client = new DocumentClient(endpoint, Options.AuthKey, policy);
 
@@ -145,7 +145,6 @@ namespace SoftwarePioniere.ReadModel.Services.AzureCosmosDb
                 //{
                 await client.CreateDatabaseAsync(new Database { Id = Options.DatabaseId }).ConfigureAwait(false);
                 _logger.LogInformation("Database {0} created", Options.DatabaseId);
-
 
                 //}
                 //else
@@ -328,7 +327,9 @@ namespace SoftwarePioniere.ReadModel.Services.AzureCosmosDb
 
             var result = await ExecuteWithRetries(() => Client.Value.CreateDocumentAsync(CollectionUri, document));
 
-            _logger.LogDebug("CreateDocumentAsync: # of RUs: {RequestCharge}", result.RequestCharge);
+            _logger.LogTrace("CreateDocumentAsync: StatusCode: {StatusCode} / RequestUnits: {RequestCharge} ",
+                result.StatusCode, result.RequestCharge);
+
             return result.Resource.Id;
         }
 
@@ -342,7 +343,8 @@ namespace SoftwarePioniere.ReadModel.Services.AzureCosmosDb
                  GetDocumentLink(id),
                  new RequestOptions { PartitionKey = new PartitionKey(partitionKey) }));
 
-            _logger.LogDebug("StatusCode of operation: {0}", result.StatusCode);
+            _logger.LogTrace("DeleteDocumentAsync: StatusCode: {DocumentId} {StatusCode} / RequestUnits: {RequestCharge} ", id,
+                result.StatusCode, result.RequestCharge);
         }
 
         /// <summary>
@@ -357,7 +359,9 @@ namespace SoftwarePioniere.ReadModel.Services.AzureCosmosDb
             //var result = await Client.Value.ReplaceDocumentAsync(GetDocumentLink(id), document);
             var result =
                 await ExecuteWithRetries(() => Client.Value.ReplaceDocumentAsync(GetDocumentLink(id), document));
-            _logger.LogDebug("ReplaceDocumentAsync: # of RUs: {RequestCharge}", result.RequestCharge);
+
+            _logger.LogTrace("ReplaceDocumentAsync: {DocumentId} StatusCode: {StatusCode} / RequestUnits: {RequestCharge} ", id,
+                result.StatusCode, result.RequestCharge);
         }
 
 
@@ -374,9 +378,10 @@ namespace SoftwarePioniere.ReadModel.Services.AzureCosmosDb
             var query = source.AsDocumentQuery();
             if (query.HasMoreResults)
             {
-                var queryResult = await query.ExecuteNextAsync().ConfigureAwait(false);
+                var result = await query.ExecuteNextAsync().ConfigureAwait(false);
+                _logger.LogTrace("ExistsDocument: {DocumentId} RequestUnits: {RequestCharge} ", id, result.RequestCharge);
 
-                if (queryResult.Any())
+                if (result.Any())
                     return true;
             }
 

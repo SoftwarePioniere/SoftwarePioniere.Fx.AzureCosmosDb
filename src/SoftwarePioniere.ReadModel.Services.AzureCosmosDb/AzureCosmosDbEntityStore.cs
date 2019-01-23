@@ -33,7 +33,7 @@ namespace SoftwarePioniere.ReadModel.Services.AzureCosmosDb
 
             //type filtern wegen partition key verletzungen
             var source = _provider.CreateQuery<T>(feedOptions).Where(x => x.EntityType == TypeKeyCache.GetEntityTypeKey<T>());
-            var xx = await source.ToArrayAsync(token).ConfigureAwait(false);
+            var xx = await source.ToArrayAsync(token, Logger).ConfigureAwait(false);
             return xx;
         }
 
@@ -50,7 +50,7 @@ namespace SoftwarePioniere.ReadModel.Services.AzureCosmosDb
 
             //type filtern wegen partition key verletzungen
             var source = _provider.CreateQuery<T>(feedOptions).Where(x => x.EntityType == TypeKeyCache.GetEntityTypeKey<T>()).Where(where);
-            var xx = await source.ToArrayAsync(token).ConfigureAwait(false);
+            var xx = await source.ToArrayAsync(token, Logger).ConfigureAwait(false);
             return xx;
 
         }
@@ -125,7 +125,6 @@ namespace SoftwarePioniere.ReadModel.Services.AzureCosmosDb
             }
             token.ThrowIfCancellationRequested();
 
-
             await _provider.DeleteItemAsync(entityId, TypeKeyCache.GetEntityTypeKey<T>());
         }
 
@@ -141,7 +140,6 @@ namespace SoftwarePioniere.ReadModel.Services.AzureCosmosDb
                 Logger.LogDebug("InternalInsertItemAsync: {EntityType} {EntityId}", typeof(T), item.EntityId);
             }
             token.ThrowIfCancellationRequested();
-
 
             await _provider.AddItemAsync(item).ConfigureAwait(false);
         }
@@ -233,6 +231,9 @@ namespace SoftwarePioniere.ReadModel.Services.AzureCosmosDb
                     _provider.GetDocumentLink(entityId),
                     new RequestOptions { PartitionKey = new PartitionKey(TypeKeyCache.GetEntityTypeKey<T>()) },
                     token);
+
+                Logger.LogTrace("ReadDocumentAsync: EntityId: {EntityId} / StatusCode: {StatusCode} / RequestUnits: {RequestCharge} ", entityId,
+                    response.StatusCode, response.RequestCharge);
 
                 var result = response.Resource.ToString();
                 var item = JsonConvert.DeserializeObject<T>(result);

@@ -3,11 +3,13 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Azure.Documents.Linq;
+using Microsoft.Extensions.Logging;
 
 namespace SoftwarePioniere.ReadModel.Services.AzureCosmosDb
 {
     public static class AzureCosmosDbLinqExtensions
     {
+        /*
         /// <summary>
         /// Gets the first result
         /// </summary>
@@ -28,8 +30,9 @@ namespace SoftwarePioniere.ReadModel.Services.AzureCosmosDb
             }
             return default(T);
         }
+*/
 
-        /// <summary>
+        /*/// <summary>
         /// Gets the first result
         /// </summary>
         /// <typeparam name="T">EntityType of the Class</typeparam>
@@ -48,10 +51,10 @@ namespace SoftwarePioniere.ReadModel.Services.AzureCosmosDb
                 }
             }
             return default(T);
-        }
+        }*/
 
 
-        /// <summary>
+        /*/// <summary>
         /// Creates a pagination wrapper with Continuation Token support
         /// </summary>
         /// <typeparam name="T"></typeparam>
@@ -85,12 +88,13 @@ namespace SoftwarePioniere.ReadModel.Services.AzureCosmosDb
             }
 
             return results;
-        }
+        }*/
 
 
-        public static async Task<T[]> ToArrayAsync<T>(this IQueryable<T> source, CancellationToken token)
+        public static async Task<T[]> ToArrayAsync<T>(this IQueryable<T> source, CancellationToken token, ILogger logger)
         {
             var documentQuery = source.AsDocumentQuery();
+            logger.LogTrace("Executing Query : {Query}", source.Expression.ToString());
             List<T> results = new List<T>();
             try
             {
@@ -99,6 +103,7 @@ namespace SoftwarePioniere.ReadModel.Services.AzureCosmosDb
                 while (documentQuery.HasMoreResults)
                 {
                     var item = await documentQuery.ExecuteNextAsync<T>(token).ConfigureAwait(false);
+                    logger.LogTrace("Request Charge for Query {RequestCharge}", item.RequestCharge);
                     results.AddRange(item);
                 }
 
