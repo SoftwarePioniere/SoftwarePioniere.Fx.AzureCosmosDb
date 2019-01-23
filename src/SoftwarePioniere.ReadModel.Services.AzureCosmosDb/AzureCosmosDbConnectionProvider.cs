@@ -11,7 +11,7 @@ namespace SoftwarePioniere.ReadModel.Services.AzureCosmosDb
 {
     public class AzureCosmosDbConnectionProvider : IEntityStoreConnectionProvider
     {
-      
+
         private readonly ILogger _logger;
         public TypeKeyCache KeyCache { get; }
 
@@ -20,7 +20,7 @@ namespace SoftwarePioniere.ReadModel.Services.AzureCosmosDb
         {
             if (loggerFactory == null) throw new ArgumentNullException(nameof(loggerFactory));
             _logger = loggerFactory.CreateLogger(GetType());
-         
+
             Options = options.Value;
             _logger.LogInformation("{Connection}", options);
             KeyCache = new TypeKeyCache();
@@ -240,9 +240,12 @@ namespace SoftwarePioniere.ReadModel.Services.AzureCosmosDb
                     CreateDatabaseAsync().ConfigureAwait(false).GetAwaiter().GetResult();
 
                 if (!CheckCollectionExists())
+                {
                     CreateCollectionAsync().ConfigureAwait(false).GetAwaiter().GetResult();
+                    CheckScaling().ConfigureAwait(false).GetAwaiter().GetResult();
+                }
 
-                CheckScaling().ConfigureAwait(false).GetAwaiter().GetResult();
+
 
                 return client;
             });
