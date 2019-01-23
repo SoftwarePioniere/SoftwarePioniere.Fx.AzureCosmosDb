@@ -6,6 +6,7 @@ using Microsoft.Azure.Documents.Client;
 using Microsoft.Azure.Documents.Linq;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Polly;
 
 namespace SoftwarePioniere.ReadModel.Services.AzureCosmosDb
 {
@@ -170,6 +171,11 @@ namespace SoftwarePioniere.ReadModel.Services.AzureCosmosDb
         /// <returns></returns>
         private async Task<TV> ExecuteWithRetries<TV>(Func<Task<TV>> function)
         {
+            //TODO: Implement with Polly
+            //Policy                
+            //    .Handle<InvalidOperationException>()
+
+
             while (true)
             {
                 TimeSpan sleepTime;

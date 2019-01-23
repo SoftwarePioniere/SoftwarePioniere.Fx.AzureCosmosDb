@@ -1,4 +1,6 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
+using FluentAssertions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using SoftwarePioniere.Extensions.DependencyInjection;
@@ -15,6 +17,16 @@ namespace SoftwarePioniere.ReadModel.Services.AzureCosmosDb.Tests
             ServiceCollection
                 .AddOptions()
                 .AddAzureCosmosDbEntityStore(options => new TestConfiguration().ConfigurationRoot.Bind("AzureCosmosDb", options));
+        }
+
+        [Fact]
+        public async Task NonExistingEntityLoadReturnsNull()
+        {
+            var store = CreateInstance();
+            var entity = await store.LoadItemAsync<FakeEntity>(Guid.NewGuid().ToString());
+
+            entity.Should().BeNull();
+
         }
 
         [Fact]
