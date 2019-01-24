@@ -21,8 +21,6 @@ namespace SoftwarePioniere.Extensions.DependencyInjection
                 .AddOptions()
                 .Configure(configureOptions);
 
-            //var settings = services.BuildServiceProvider().GetService<IOptions<AzureCosmosDbOptions>>().Value;
-
             services
                 .AddSingleton<AzureCosmosDbConnectionProvider>()
                 .AddSingleton<IEntityStoreConnectionProvider>(provider => provider.GetRequiredService<AzureCosmosDbConnectionProvider>())

@@ -23,10 +23,9 @@ namespace SoftwarePioniere.ReadModel.Services.AzureCosmosDb
 
         public override async Task<T[]> LoadItemsAsync<T>(CancellationToken token = default(CancellationToken))
         {
-            if (Logger.IsEnabled(LogLevel.Debug))
-            {
-                Logger.LogDebug("LoadItemsAsync: {EntityType}", typeof(T));
-            }
+
+            Logger.LogTrace("LoadItemsAsync: {EntityType}", typeof(T));
+
             token.ThrowIfCancellationRequested();
 
             var feedOptions = new FeedOptions { MaxItemCount = -1, EnableCrossPartitionQuery = false };
@@ -39,10 +38,8 @@ namespace SoftwarePioniere.ReadModel.Services.AzureCosmosDb
 
         public override async Task<T[]> LoadItemsAsync<T>(Expression<Func<T, bool>> where, CancellationToken token = default(CancellationToken))
         {
-            if (Logger.IsEnabled(LogLevel.Debug))
-            {
-                Logger.LogDebug("LoadItemsAsync: {EntityType} {Expression}", typeof(T), where);
-            }
+            Logger.LogTrace("LoadItemsAsync: {EntityType} {Expression}", typeof(T), where);
+
             token.ThrowIfCancellationRequested();
 
 
@@ -119,10 +116,8 @@ namespace SoftwarePioniere.ReadModel.Services.AzureCosmosDb
                 throw new ArgumentNullException(nameof(entityId));
             }
 
-            if (Logger.IsEnabled(LogLevel.Debug))
-            {
-                Logger.LogDebug("InternalDeleteItemAsync: {EntityType} {EntityId}", typeof(T), entityId);
-            }
+            Logger.LogTrace("InternalDeleteItemAsync: {EntityType} {EntityId}", typeof(T), entityId);
+
             token.ThrowIfCancellationRequested();
 
             await _provider.DeleteItemAsync(entityId, TypeKeyCache.GetEntityTypeKey<T>());
@@ -135,10 +130,9 @@ namespace SoftwarePioniere.ReadModel.Services.AzureCosmosDb
                 throw new ArgumentNullException(nameof(item));
             }
 
-            if (Logger.IsEnabled(LogLevel.Debug))
-            {
-                Logger.LogDebug("InternalInsertItemAsync: {EntityType} {EntityId}", typeof(T), item.EntityId);
-            }
+
+            Logger.LogTrace("InternalInsertItemAsync: {EntityType} {EntityId}", typeof(T), item.EntityId);
+
             token.ThrowIfCancellationRequested();
 
             await _provider.AddItemAsync(item).ConfigureAwait(false);
@@ -151,11 +145,7 @@ namespace SoftwarePioniere.ReadModel.Services.AzureCosmosDb
                 throw new ArgumentNullException(nameof(items));
             }
 
-            if (Logger.IsEnabled(LogLevel.Debug))
-            {
-                Logger.LogDebug("BulkInsertItemsAsync: {EntityType} {EntityCount}", typeof(T), items.Length);
-            }
-
+            Logger.LogTrace("BulkInsertItemsAsync: {EntityType} {EntityCount}", typeof(T), items.Length);
 
             foreach (var item in items)
             {
@@ -172,10 +162,8 @@ namespace SoftwarePioniere.ReadModel.Services.AzureCosmosDb
                 throw new ArgumentNullException(nameof(item));
             }
 
-            if (Logger.IsEnabled(LogLevel.Debug))
-            {
-                Logger.LogDebug("InternalInsertOrUpdateItemAsync: {EntityType} {EntityId}", typeof(T), item.EntityId);
-            }
+            Logger.LogTrace("InternalInsertOrUpdateItemAsync: {EntityType} {EntityId}", typeof(T), item.EntityId);
+
             token.ThrowIfCancellationRequested();
 
 
@@ -197,10 +185,8 @@ namespace SoftwarePioniere.ReadModel.Services.AzureCosmosDb
                 throw new ArgumentNullException(nameof(entityId));
             }
 
-            if (Logger.IsEnabled(LogLevel.Debug))
-            {
-                Logger.LogDebug("InternalLoadItemAsync: {EntityType} {EntityId}", typeof(T), entityId);
-            }
+            Logger.LogTrace("InternalLoadItemAsync: {EntityType} {EntityId}", typeof(T), entityId);
+
             token.ThrowIfCancellationRequested();
 
             try

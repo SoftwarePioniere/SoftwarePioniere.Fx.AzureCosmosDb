@@ -22,7 +22,7 @@ namespace SoftwarePioniere.ReadModel.Services.AzureCosmosDb
             _logger = loggerFactory.CreateLogger(GetType());
 
             Options = options.Value;
-            _logger.LogInformation("{Connection}", options);
+            _logger.LogInformation("AzureCosmosDb Connection {Connection}", options);
             KeyCache = new TypeKeyCache();
             CollectionUri = GetCollectionLink();
             InitClient();
@@ -81,11 +81,11 @@ namespace SoftwarePioniere.ReadModel.Services.AzureCosmosDb
 
                 if (database != null)
                 {
-                    _logger.LogDebug("Database {0} found", Options.DatabaseId);
+                    _logger.LogTrace("Database {0} found", Options.DatabaseId);
                     return true;
                 }
 
-                _logger.LogDebug("Database {0} not found", Options.DatabaseId);
+                _logger.LogTrace("Database {0} not found", Options.DatabaseId);
                 return false;
             }
         }
@@ -104,7 +104,7 @@ namespace SoftwarePioniere.ReadModel.Services.AzureCosmosDb
 
             if (PolicyConfig != null)
             {
-                _logger.LogTrace("Inoking PolicyConfig");
+                _logger.LogTrace("Invoking PolicyConfig");
                 PolicyConfig(policy);
             }
 
