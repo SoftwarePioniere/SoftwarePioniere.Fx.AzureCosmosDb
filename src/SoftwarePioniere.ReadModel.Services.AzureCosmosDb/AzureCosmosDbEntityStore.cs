@@ -7,7 +7,6 @@ using Microsoft.Azure.Documents;
 using Microsoft.Azure.Documents.Client;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 
 namespace SoftwarePioniere.ReadModel.Services.AzureCosmosDb
 {
@@ -246,10 +245,8 @@ namespace SoftwarePioniere.ReadModel.Services.AzureCosmosDb
                 throw new ArgumentNullException(nameof(item));
             }
 
-            if (Logger.IsEnabled(LogLevel.Debug))
-            {
-                Logger.LogDebug("InternalUpdateItemAsync: {EntityType} {EntityId}", typeof(T), item.EntityId);
-            }
+            Logger.LogTrace("InternalUpdateItemAsync: {EntityType} {EntityId}", typeof(T), item.EntityId);
+
             token.ThrowIfCancellationRequested();
 
 
