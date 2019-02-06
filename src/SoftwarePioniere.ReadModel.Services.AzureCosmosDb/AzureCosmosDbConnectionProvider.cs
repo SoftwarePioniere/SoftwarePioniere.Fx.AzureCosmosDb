@@ -96,9 +96,9 @@ namespace SoftwarePioniere.ReadModel.Services.AzureCosmosDb
             {
                 ConnectionMode = ConnectionMode.Gateway,
                 ConnectionProtocol = Protocol.Https,
-                MaxConnectionLimit = 100                
+                MaxConnectionLimit = 100
             };
-            
+
             var endpoint = new Uri(Options.EndpointUrl);
             var client = new DocumentClient(endpoint, Options.AuthKey, policy);
 
@@ -362,6 +362,19 @@ namespace SoftwarePioniere.ReadModel.Services.AzureCosmosDb
 
             _logger.LogTrace("ReplaceDocumentAsync: {DocumentId} StatusCode: {StatusCode} / RequestUnits: {RequestCharge} ", id,
                 result.StatusCode, result.RequestCharge);
+        }
+
+        public DocumentCollection GetCollection()
+        {
+            using (var client = CreateClient())
+            {
+                var collection = client.CreateDocumentCollectionQuery(UriFactory.CreateDatabaseUri(Options.DatabaseId))
+                    .Where(c => c.Id == Options.CollectionId)
+                    .ToArray()
+                    .SingleOrDefault();
+
+                return collection;
+            }
         }
 
 

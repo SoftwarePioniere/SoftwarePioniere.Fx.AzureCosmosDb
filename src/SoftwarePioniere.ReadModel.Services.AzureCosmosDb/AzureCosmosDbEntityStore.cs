@@ -3,6 +3,8 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Azure.CosmosDB.BulkExecutor;
+using Microsoft.Azure.CosmosDB.BulkExecutor.BulkImport;
 using Microsoft.Azure.Documents;
 using Microsoft.Azure.Documents.Client;
 using Microsoft.Extensions.Logging;
@@ -146,10 +148,47 @@ namespace SoftwarePioniere.ReadModel.Services.AzureCosmosDb
 
             Logger.LogTrace("BulkInsertItemsAsync: {EntityType} {EntityCount}", typeof(T), items.Length);
 
-            foreach (var item in items)
+            var client = _provider.Client.Value;
+            try
             {
-                token.ThrowIfCancellationRequested();
-                await InsertItemAsync(item, token);
+                // Set retries to 0 to pass complete control to bulk executor.
+                client.ConnectionPolicy.RetryOptions.MaxRetryWaitTimeInSeconds = 0;
+                client.ConnectionPolicy.RetryOptions.MaxRetryAttemptsOnThrottledRequests = 0;
+
+                IBulkExecutor bulkExecutor = new BulkExecutor(client, _provider.GetCollection());
+                await bulkExecutor.InitializeAsync();
+
+                var bulkImportResponse = await bulkExecutor.BulkImportAsync(
+                    documents: items,
+                    enableUpsert: true,
+                    disableAutomaticIdGeneration: true,
+                    maxConcurrencyPerPartitionKeyRange: null,
+                    maxInMemorySortingBatchSize: null,
+                    cancellationToken: token);
+
+                Logger.LogTrace(
+                    "BulkImportAsync: Imported: {NumberOfDocumentsImported} / RequestUnits: {RequestCharge} / TimeTaken {TotalTimeTaken}",
+                    bulkImportResponse.NumberOfDocumentsImported,
+                    bulkImportResponse.TotalRequestUnitsConsumed,
+                    bulkImportResponse.TotalTimeTaken);
+
+                if (bulkImportResponse.BadInputDocuments != null && bulkImportResponse.BadInputDocuments.Any())
+                {
+                    Logger.LogWarning("BulkImport Bad Documents");
+                    foreach (var o in bulkImportResponse.BadInputDocuments)
+                    {
+                        Logger.LogWarning("BulkImport Bad Doc {@doc}", o);
+                    }
+
+                    throw new InvalidOperationException("Bulk Import Bad Documents");
+
+                }
+            }
+            finally
+            {
+
+                client.ConnectionPolicy.RetryOptions.MaxRetryWaitTimeInSeconds = 30;
+                client.ConnectionPolicy.RetryOptions.MaxRetryAttemptsOnThrottledRequests = 9;
             }
 
         }
