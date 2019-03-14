@@ -11,8 +11,8 @@
 
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Azure.CosmosDB.BulkExecutor" Version="2.1.0-preview2" />
-    <PackageReference Include="SoftwarePioniere.ReadModel.Services" Version="0.4.19" />
+    <PackageReference Include="Microsoft.Azure.CosmosDB.BulkExecutor" Version="2.2.0-preview2" />
+    <PackageReference Include="SoftwarePioniere.ReadModel.Services" Version="0.4.23" />
   </ItemGroup>
 
 </Project>
