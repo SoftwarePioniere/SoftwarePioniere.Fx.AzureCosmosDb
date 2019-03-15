@@ -211,26 +211,31 @@ namespace SoftwarePioniere.ReadModel.Services.AzureCosmosDb
 
         private async Task CheckScaling()
         {
-            var client = CreateClient();
+            if (Options.ScaleOfferThroughput)
+            {
 
-            var col = client.CreateDocumentCollectionQuery(UriFactory.CreateDatabaseUri(Options.DatabaseId))
-                .Where(x => x.Id == Options.CollectionId)
-                .AsEnumerable()
-                .SingleOrDefault()
-                ;
+                var client = CreateClient();
 
-            var offer =
-            client.CreateOfferQuery()
-                    .Where(r => r.ResourceLink == col.SelfLink)
+                var col = client.CreateDocumentCollectionQuery(UriFactory.CreateDatabaseUri(Options.DatabaseId))
+                    .Where(x => x.Id == Options.CollectionId)
                     .AsEnumerable()
-                    .SingleOrDefault();
+                    .SingleOrDefault()
+                    ;
 
-            _logger.LogInformation("Setting OfferThroughput to {0}", Options.OfferThroughput);
-            // Set the throughput to the new value, for example 12,000 request units per second
-            offer = new OfferV2(offer, Options.OfferThroughput);
+                var offer =
+                client.CreateOfferQuery()
+                        .Where(r => r.ResourceLink == col.SelfLink)
+                        .AsEnumerable()
+                        .SingleOrDefault();
 
-            // Now persist these changes to the collection by replacing the original offer resource
-            await client.ReplaceOfferAsync(offer);
+                _logger.LogInformation("Setting OfferThroughput to {0}", Options.OfferThroughput);
+                // Set the throughput to the new value, for example 12,000 request units per second
+                offer = new OfferV2(offer, Options.OfferThroughput);
+
+                // Now persist these changes to the collection by replacing the original offer resource
+                await client.ReplaceOfferAsync(offer);
+
+            }
         }
 
 

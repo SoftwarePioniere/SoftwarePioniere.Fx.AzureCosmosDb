@@ -10,6 +10,8 @@
 
         public string EndpointUrl { get; set; } = "https://localhost:8081";
 
+        public bool ScaleOfferThroughput { get; set; } = false;
+
         public int OfferThroughput { get; set; } = 400;
 
         public override string ToString()
