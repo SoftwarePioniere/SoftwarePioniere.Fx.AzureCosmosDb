@@ -209,9 +209,9 @@ namespace SoftwarePioniere.ReadModel.Services.AzureCosmosDb
             }
         }
 
-        private async Task CheckScaling()
+        private async Task CheckScaling(bool force)
         {
-            if (Options.ScaleOfferThroughput)
+            if (Options.ScaleOfferThroughput || force)
             {
 
                 var client = CreateClient();
@@ -247,15 +247,17 @@ namespace SoftwarePioniere.ReadModel.Services.AzureCosmosDb
                 var client = CreateClient();
                 client.OpenAsync().ConfigureAwait(false).GetAwaiter().GetResult();
                 if (!CheckDatabaseExists())
+                {
                     CreateDatabaseAsync().ConfigureAwait(false).GetAwaiter().GetResult();
+                }
 
                 if (!CheckCollectionExists())
                 {
                     CreateCollectionAsync().ConfigureAwait(false).GetAwaiter().GetResult();
-                    CheckScaling().ConfigureAwait(false).GetAwaiter().GetResult();
+                    CheckScaling(true).ConfigureAwait(false).GetAwaiter().GetResult();
                 }
 
-
+                CheckScaling(false).ConfigureAwait(false).GetAwaiter().GetResult();
 
                 return client;
             });

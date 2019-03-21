@@ -4,7 +4,6 @@ using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Azure.CosmosDB.BulkExecutor;
-using Microsoft.Azure.CosmosDB.BulkExecutor.BulkImport;
 using Microsoft.Azure.Documents;
 using Microsoft.Azure.Documents.Client;
 using Microsoft.Extensions.Logging;
