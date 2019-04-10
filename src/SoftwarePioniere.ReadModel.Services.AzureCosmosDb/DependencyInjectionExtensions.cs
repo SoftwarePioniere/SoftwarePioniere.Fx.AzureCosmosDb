@@ -1,13 +1,12 @@
 ﻿using System;
 using Foundatio.Caching;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using SoftwarePioniere.ReadModel;
 using SoftwarePioniere.ReadModel.Services.AzureCosmosDb;
 
 // ReSharper disable once CheckNamespace
-namespace SoftwarePioniere.Extensions.DependencyInjection
+namespace Microsoft.Extensions.DependencyInjection
 {
     public static class DependencyInjectionExtensions
     {
