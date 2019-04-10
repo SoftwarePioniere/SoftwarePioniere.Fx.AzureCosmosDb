@@ -2,10 +2,16 @@ FROM microsoft/dotnet:2-sdk AS restore
 ARG CONFIGURATION=Release
 WORKDIR /proj
 COPY nuget.config.build.tmp ./nuget.config
-COPY Directory.Build.* ./
-COPY *.sln ./
-COPY src/SoftwarePioniere.ReadModel.Services.AzureCosmosDb/*.csproj ./src/SoftwarePioniere.ReadModel.Services.AzureCosmosDb/
-COPY test/SoftwarePioniere.ReadModel.Services.AzureCosmosDb.Tests/*.csproj ./test/SoftwarePioniere.ReadModel.Services.AzureCosmosDb.Tests/
+COPY *.sln *.props ./
+
+# Copy the main source project files
+COPY src/*/*.csproj ./
+RUN for file in $(ls *.csproj); do mkdir -p src/${file%.*}/ && mv $file src/${file%.*}/; done
+
+# Copy the test project files
+COPY test/*/*.csproj ./
+RUN for file in $(ls *.csproj); do mkdir -p test/${file%.*}/ && mv $file test/${file%.*}/; done
+
 RUN dotnet restore SoftwarePioniere.AzureCosmosDb.sln
 
 FROM restore as src
