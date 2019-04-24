@@ -264,7 +264,7 @@ namespace SoftwarePioniere.ReadModel.Services.AzureCosmosDb
             }
             catch (DocumentClientException exnf) when (exnf.Error.Code == "NotFound")
             {
-                Logger.LogWarning("Entity with Id not found {EntityId}", entityId);
+                Logger.LogTrace("Entity with Id not found {EntityId}", entityId);
                 return null;
             }
             catch (DocumentClientException e)
