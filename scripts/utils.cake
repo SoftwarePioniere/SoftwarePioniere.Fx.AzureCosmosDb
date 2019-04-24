@@ -9,14 +9,15 @@ public static bool IsTfs(ICakeContext context)
 
 public static void ReplaceTextInFile(ICakeContext context, string fileName, string findText, string replaceText)
 {
-    context.Verbose($"ReplaceTextInFile: {fileName}");
+    context.Verbose($"ReplaceTextInFile: {fileName} {findText} {replaceText}");
     var contents = System.IO.File.ReadAllText(fileName, System.Text.Encoding.UTF8);
     contents = contents.Replace(findText, replaceText);
+    context.Verbose($"Writing all Text: {contents}");
     System.IO.File.WriteAllText(fileName, contents, System.Text.Encoding.UTF8);
 }
 
 public static void SetBuildNumber(ICakeContext context, string version) {
-     context.Verbose("Set Build Number");
+     context.Verbose($"Set Build Number: {version}");
 
      if(context.BuildSystem().AppVeyor.IsRunningOnAppVeyor) {
          context.Verbose("Running on AppVeyor");

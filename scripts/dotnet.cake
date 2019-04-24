@@ -38,39 +38,39 @@ public class MyDotNet {
 
     public static void CreateNugetConfigTemp() {
         TestInit();
+        _context.Verbose("CreateNugetConfigTemp");
 
         var buildFile = _context.File("./nuget.config.build");
 
         var fileName = "./nuget.config.build.tmp";
         var tmpFile = _context.File(fileName);
 
+        if ( _context.FileExists(tmpFile)  ) {
+            _context.Verbose($"deleting {tmpFile}");
+            _context.DeleteFile(tmpFile);
+        }
+
         if ( !_context.FileExists(buildFile)  ) {
             // if there is no build file copy default nuget.config
             var configFile = _context.File("./nuget.config");
 
-            if ( !_context.FileExists(tmpFile)  )
-            {
-                _context.Verbose($"copy {configFile} to {tmpFile}");
-                _context.CopyFile( configFile, tmpFile );
-            }
+            _context.Verbose($"copy {configFile} to {tmpFile}");
+            _context.CopyFile(configFile, tmpFile );
         }
         else {
-
-            if ( !_context.FileExists(tmpFile)  )
-            {
                 _context.Verbose($"copy {buildFile} to {tmpFile}");
                 _context.CopyFile( buildFile, tmpFile );
 
                 // _context.ReplaceTextInFiles(fileName, "{{VSTS_USER}}", EnvironmentVariable("VSTS_USER"));
                 ReplaceTextInFile(_context, fileName, "{{VSTS_TOKEN}}", _vstsToken);
                 ReplaceTextInFile(_context, fileName, "{{BUILD_CONFIG}}", _configuration);
-            }
         }
 
     }
 
     public static string[] GetDockerTags(string image){
         TestInit();
+        _context.Verbose($"GetDockerTags {image}");
 
         var tag = new [] {
             $"{image}:{MyGitVersion.GetVersion()}"
@@ -85,42 +85,61 @@ public class MyDotNet {
             };
         }
 
+        foreach (var t in tag) {
+             _context.Verbose($"tag {t}");
+        }
+
         return tag;
     }
 
     public static string[] GetDockerPackTags(string image){
         TestInit();
+        _context.Verbose($"GetDockerPackTags {image}");
 
          var tag = new [] {
             $"{image}.packages:{MyGitVersion.GetVersion()}"
         };
+
+        foreach (var t in tag) {
+             _context.Verbose($"tag {t}");
+        }
 
         return tag;
     }
 
     public static string[] GetDockerTestRunnerTags(string image){
         TestInit();
+        _context.Verbose($"GetDockerTestRunnerTags {image}");
 
-         var tag = new [] {
+        var tag = new [] {
             $"{image}.testrunner:{MyGitVersion.GetVersion()}"
         };
+
+        foreach (var t in tag) {
+             _context.Verbose($"tag {t}");
+        }
 
         return tag;
     }
 
       public static string[] GetDockerPushPackagesTags(string image){
         TestInit();
+        _context.Verbose($"GetDockerPushPackagesTags {image}");
 
          var tag = new [] {
             $"{image}.push-packages:{MyGitVersion.GetVersion()}"
         };
+
+        foreach (var t in tag) {
+             _context.Verbose($"tag {t}");
+        }
 
         return tag;
     }
 
     public static void RestoreSolution(ConvertableFilePath solutionFile){
         TestInit();
-        _context.Information("Restoring Packages...");
+        _context.Information($"RestoreSolution {solutionFile.Path.FullPath}");
 
         var settings = new DotNetCoreRestoreSettings {
             ConfigFile = _context.File("./nuget.config"),
@@ -137,8 +156,7 @@ public class MyDotNet {
 
     public static void BuildSolution(ConvertableFilePath solutionFile){
         TestInit();
-
-        _context.Information("Building Solution...");
+        _context.Information($"BuildSolution {solutionFile.Path.FullPath}");
 
         var settings = new DotNetCoreBuildSettings {
             Configuration = _configuration,
@@ -157,10 +175,9 @@ public class MyDotNet {
         }
     }
 
-    public static void PackSolution(ConvertableFilePath solutionFile,ConvertableDirectoryPath artifactsDirectory){
+    public static void PackSolution(ConvertableFilePath solutionFile, ConvertableDirectoryPath artifactsDirectory){
         TestInit();
-
-        _context.Information("Packing Solution...");
+        _context.Information($"PackSolution {solutionFile.Path.FullPath}");
 
         var settings = new DotNetCorePackSettings {
             Configuration = _configuration,
@@ -184,8 +201,7 @@ public class MyDotNet {
 
     public static void PushPackages(ConvertableDirectoryPath artifactsDirectory, DotNetCoreNuGetPushSettings settings){
         TestInit();
-
-        _context.Information("Pushing Packages...");
+        _context.Information("PushPackages");
 
         var pkgs = _context.GetFiles($"{artifactsDirectory.Path.FullPath}/packages/**/*.symbols.nupkg");
 
@@ -204,7 +220,7 @@ public class MyDotNet {
     public static void TestProjects(string filter){
         TestInit();
 
-        _context.Information("Testing Projects...");
+        _context.Information($"TestProjects  {filter}");
 
         var projects = _context.GetFiles(filter);
         foreach(var project in projects)
@@ -234,15 +250,15 @@ public class MyDotNet {
     public static void PublishProjects(ConvertableDirectoryPath artifactsDirectory, string filter) {
         TestInit();
 
-        _context.Information("Publishing Projects...");
+        _context.Information($"PublishProjects {filter}");
 
         var projects = _context.GetFiles(filter);
         foreach(var project in projects)
         {
-            _context.Information($"Publishing Project: {project.FullPath}");
+            _context.Verbose($"Publishing Project: {project.FullPath}");
             var projName = project.GetFilenameWithoutExtension().ToString();
             var outputDir = artifactsDirectory + _context.Directory(projName);
-            _context.Information($"OutputDirectory: {outputDir}");
+            _context.Verbose($"OutputDirectory: {outputDir}");
 
             var settings = new DotNetCorePublishSettings
             {
@@ -268,7 +284,7 @@ public class MyDotNet {
     public static void DockerBuild(string image) {
         TestInit();
 
-        _context.Information("Building with Docker...");
+        _context.Information($"DockerBuild {image}");
 
         var settings = new DockerImageBuildSettings {
         // Rm = true,
@@ -290,8 +306,7 @@ public class MyDotNet {
 
     public static void DockerBuildProject(string image, string project) {
         TestInit();
-
-        _context.Information($"Building Project with Docker... {project}");
+        _context.Information($"DockerBuildProject {project} {image}");
 
         var settings = new DockerImageBuildSettings {
         // Rm = true,
@@ -315,8 +330,7 @@ public class MyDotNet {
 
     public static void DockerBuildTestImage(string image, string project) {
         TestInit();
-
-        _context.Information($"Building Test Runner Images with Docker...");
+        _context.Information($"DockerBuildTestImage {project} {image}");
 
         var settings = new DockerImageBuildSettings {
             // Rm = true,
@@ -341,6 +355,7 @@ public class MyDotNet {
 
     public static void DockerTestProject(string image, string project, ConvertableDirectoryPath artifactsDirectory, string[] env = null) {
         TestInit();
+        _context.Information($"DockerTestProject {project} {image}");
 
         DockerBuildTestImage(image, project);
 
@@ -352,8 +367,6 @@ public class MyDotNet {
         }
 
         _context.CleanDirectories(new DirectoryPath[] { testResultDirectory });
-
-        _context.Information($"Running Test with Docker...");
 
         var settings = new DockerContainerRunSettings {
             Rm = true,
@@ -379,6 +392,7 @@ public class MyDotNet {
 
      public static void DockerComposeTestProject(string image, string project, ConvertableDirectoryPath artifactsDirectory, string[] env = null) {
         TestInit();
+        _context.Information($"DockerComposeTestProject {project} {image}");
 
         DockerBuildTestImage(image, project);
 
@@ -398,8 +412,6 @@ public class MyDotNet {
             _context.DeleteFile(envFile);
         }
 
-        _context.Information($"Running Test with Docker Compose...");
-
         var tags = GetDockerTestRunnerTags(image);
         var tag = tags[0];
 
@@ -417,10 +429,11 @@ public class MyDotNet {
                 $"TESTRESULTS={_context.MakeAbsolute(testResultDirectory)}"
             });
 
-        _context.Information($"Writing .env File {envFile.Path.FullPath}");
+        _context.Verbose($"Writing .env File {envFile.Path.FullPath}");
 
         System.IO.File.WriteAllText(envFile.Path.FullPath, "", System.Text.Encoding.UTF8);
         foreach(var line in tempEnv) {
+                _context.Verbose($".env line {line}");
                 //System.IO.File.AppendAllLines(tempEnv.ToArray(), envFile.Path.FullPath, System.Text.Encoding.UTF8);
                 System.IO.File.AppendAllText(envFile.Path.FullPath, line,  System.Text.Encoding.UTF8);
                 System.IO.File.AppendAllText(envFile.Path.FullPath, System.Environment.NewLine, System.Text.Encoding.UTF8);
@@ -431,36 +444,44 @@ public class MyDotNet {
                 "docker-compose.override.testrunner.yml"
         };
 
-
+        var projectName = string.Concat(project , MyGitVersion.GetVersion()).Replace(".","_").Replace(":","_");
 
         if (!_isDryRun) {
 
             try
             {
-                _context.Information($"Running docker compose run");
+                _context.Verbose("Running docker compose run");
 
                  var settings = new DockerComposeRunSettings  {
-                    DetachedMode = true,
+                    //DetachedMode = true,
                     Environment = tempEnv.ToArray(),
-                    Files = dcFiles
+                    Files = dcFiles,
+                    // Verbose = true,
+                    Rm = true,
+                    ProjectName = projectName
                 };
 
-                _context.DockerComposeRun(settings, "testrunner", "dotnet", "test", "--logger:trx", "--no-build", "--no-restore"
-                                , "-r" , "/testresults", "-c", _configuration
-                                , $"/p:NuGetVersionV2={MyGitVersion.GetVersion()}" , $"/p:AssemblySemVer={MyGitVersion.GetAssemblyVersion()}"
-                                );
+                _context.DockerComposeRun(settings, "testrunner");
+                // , "dotnet", "test", "--logger:trx", "--no-build", "--no-restore"
+                //                 , "-r" , "/testresults", "-c", _configuration
+                //                 , $"/p:NuGetVersionV2={MyGitVersion.GetVersion()}" , $"/p:AssemblySemVer={MyGitVersion.GetAssemblyVersion()}"
+                //                 );
+
             }
-            catch (System.Exception)
+            catch (System.Exception ex)
             {
+                _context.Error(ex.Message);
                 throw;
             }
             finally
             {
-                 _context.Information($"Running docker compose down");
+                 _context.Verbose("Running docker compose down");
 
                  var settings = new DockerComposeDownSettings {
                     Files = dcFiles,
-                    RemoveOrphans = true
+                    RemoveOrphans = true,
+                    // Verbose = true,
+                    ProjectName = projectName
                 };
 
                 _context.DockerComposeDown(settings);
@@ -479,7 +500,7 @@ public class MyDotNet {
     public static void DockerPack(string image) {
         TestInit();
 
-        _context.Information($"Building Pack with Docker...");
+        _context.Information($"DockerPack {image}");
 
         var settings = new DockerImageBuildSettings {
         // Rm = true,
@@ -504,7 +525,7 @@ public class MyDotNet {
     public static void DockerPushPackages(string image) {
         TestInit();
 
-        _context.Information($"Pushing Packages with Docker...");
+        _context.Information($"DockerPushPackages {image}");
 
         var settings = new DockerContainerRunSettings {
             Rm = true
@@ -524,14 +545,15 @@ public class MyDotNet {
     public static void DockerPush(string image) {
         TestInit();
 
-        _context.Information("Pushing Docker...");
+         _context.Information($"DockerPush {image}");
+
         MyDocker.Login();
 
         var tags = GetDockerTags(image);
 
         foreach (var tag in tags)
         {
-            _context.Information($"Pushin Image/Tag: {tag}");
+            _context.Information($"DockerPush Image/Tag: {tag}");
 
             if (!_isDryRun) {
                 _context.DockerPush(tag);
